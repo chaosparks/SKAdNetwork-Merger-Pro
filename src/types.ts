@@ -9,7 +9,9 @@ export interface MergeResult {
   addedItems: string[];
 }
 
-export enum TabOption {
-  MERGE = 'MERGE',
-  AI_ANALYSIS = 'AI_ANALYSIS'
-}
+export const TabOption = {
+  MERGE: 'MERGE',
+  AI_ANALYSIS: 'AI_ANALYSIS'
+} as const;
+
+export type TabOption = typeof TabOption[keyof typeof TabOption];
