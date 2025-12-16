@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GOOGLE_SAMPLE, UNITY_SAMPLE } from './constants';
+import { GOOGLE_SAMPLE, UNITY_SAMPLE, ADMOB_DOCS_URL, UNITY_DOCS_URL } from './constants';
 import { mergeSkAdNetworks, extractIds } from './services/skadnetwork';
 import { analyzeConfigWithGemini } from './services/geminiService';
 import { Button } from './components/Button';
@@ -13,7 +13,10 @@ import {
   Bot, 
   Code2, 
   AlertCircle,
-  Key
+  Key,
+  Download,
+  FileJson,
+  ExternalLink
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -51,6 +54,49 @@ const App: React.FC = () => {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
     }
+  };
+
+  const handleDownloadPlistJson = () => {
+    if (!mergeResult) return;
+
+    // Re-extract all IDs from the final merged XML to ensure we have the complete list
+    const allIds = extractIds(mergeResult.mergedXml);
+
+    // Standard Info.plist structure representation in JSON
+    const jsonStructure = {
+      SKAdNetworkItems: allIds.map(id => ({
+        SKAdNetworkIdentifier: id
+      }))
+    };
+
+    const blob = new Blob([JSON.stringify(jsonStructure, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'skadnetwork_items_plist.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadSimpleJson = () => {
+    if (!mergeResult) return;
+
+    const allIds = extractIds(mergeResult.mergedXml);
+
+    // Optimized: Simple array of strings, removing the repeated key 'SKAdNetworkIdentifier'
+    const jsonStructure = allIds;
+
+    const blob = new Blob([JSON.stringify(jsonStructure, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'skadnetwork_items_optimized.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleAiAnalysis = async () => {
@@ -115,12 +161,22 @@ const App: React.FC = () => {
               
               {/* Left Column: Base */}
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs">A</span>
-                    Base Config (e.g. Google Mobile Ads)
-                  </label>
-                  <span className="text-xs text-slate-400">
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs">A</span>
+                      Base Config (e.g. Google Mobile Ads)
+                    </label>
+                    <a 
+                      href={ADMOB_DOCS_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition-colors"
+                    >
+                      Latest AdMob List <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                  <span className="text-xs text-slate-400 mt-1">
                     {extractIds(baseInput).length} IDs detected
                   </span>
                 </div>
@@ -142,12 +198,22 @@ const App: React.FC = () => {
 
               {/* Right Column: To Merge */}
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">B</span>
-                    Merge Source (e.g. Unity Ads)
-                  </label>
-                  <span className="text-xs text-slate-400">
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">B</span>
+                      Merge Source (e.g. Unity Ads)
+                    </label>
+                    <a 
+                      href={UNITY_DOCS_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition-colors"
+                    >
+                      Latest Unity Ads List <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                  <span className="text-xs text-slate-400 mt-1">
                     {extractIds(mergeInput).length} IDs detected
                   </span>
                 </div>
@@ -211,10 +277,18 @@ const App: React.FC = () => {
                       value={mergeResult.mergedXml}
                       className="w-full h-96 p-4 rounded-lg bg-slate-800 text-slate-50 font-mono text-xs leading-relaxed resize-none border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button onClick={handleCopyResult} variant="secondary" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <Button onClick={handleDownloadSimpleJson} variant="secondary" size="sm" className="bg-white/10 text-white border-white/20 hover:bg-white/20" title="Optimized JSON (Array only)">
+                        <FileJson className="w-4 h-4 mr-2" />
+                        Simple JSON
+                      </Button>
+                      <Button onClick={handleDownloadPlistJson} variant="secondary" size="sm" className="bg-white/10 text-white border-white/20 hover:bg-white/20" title="Standard Plist JSON">
+                        <Download className="w-4 h-4 mr-2" />
+                        Plist JSON
+                      </Button>
+                      <Button onClick={handleCopyResult} variant="secondary" size="sm" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
                         <Copy className="w-4 h-4 mr-2" />
-                        Copy to Clipboard
+                        Copy XML
                       </Button>
                     </div>
                  </div>
