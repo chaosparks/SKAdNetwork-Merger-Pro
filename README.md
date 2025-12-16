@@ -1,73 +1,36 @@
-# React + TypeScript + Vite
+# SKAdNetwork Merger Pro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**SKAdNetwork Merger Pro** is a specialized utility for iOS developers and AdTech professionals. It simplifies the management of `SKAdNetworkIdentifier` lists in `Info.plist` files, which are required for iOS advertising privacy compliance.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🔗 Smart Merging
+![img](img/screen-2.png)  
+![img](img/screen-3.png)  
+Seamlessly combine disparate SKAdNetwork lists (e.g., merging Google AdMob defaults with Unity Ads or IronSource lists).
+*   **Deduplication:** Automatically detects and ignores duplicate IDs.
+*   **Format Agnostic:** Intelligent parsing handles raw ID lists, `<dict>` snippets, or full XML blocks.
 
-## React Compiler
+### 🤖 AI Config Analysis
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![img](img/screen-1.png)  
+Powered by **Google Gemini 2.5 Flash**, this feature provides intelligent insights:
+*   **Validation:** Checks XML structure validity.
+*   **Network Identification:** Identifies major ad networks (Google, AppLovin, Unity, etc.) associated with specific IDs.
+*   **Summary:** Provides a brief audit of your current ad network setup.
 
-## Expanding the ESLint configuration
+### 🔒 Secure & Local
+*   **Client-Side Processing:** All merging logic happens in your browser.
+*   **Direct API Calls:** When using AI features, your API Key and data are sent directly to Google's GenAI endpoint. No intermediate servers store your data.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Usage
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **Merge Tab:** Paste your main `Info.plist` content on the left and the new network IDs on the right. Click **Merge Lists** and copy the result.
+2.  **AI Validator Tab:** Enter your Gemini API Key, paste your list, and click **Analyze** to get instant insights.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   React 19
+*   TypeScript
+*   Tailwind CSS
+*   Google GenAI SDK (`gemini-2.5-flash`)
