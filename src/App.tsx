@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GOOGLE_SAMPLE, UNITY_SAMPLE } from './constants';
 import { mergeSkAdNetworks, extractIds } from './services/skadnetwork';
 import { analyzeConfigWithGemini } from './services/geminiService';
@@ -12,7 +12,8 @@ import {
   CheckCircle, 
   Bot, 
   Code2, 
-  AlertCircle 
+  AlertCircle,
+  Key
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   const [aiOutput, setAiOutput] = useState<string>('');
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [userApiKey, setUserApiKey] = useState<string>('');
 
   // UI State
   const [showToast, setShowToast] = useState<boolean>(false);
@@ -56,10 +58,10 @@ const App: React.FC = () => {
     setAiError(null);
     setAiOutput('');
     try {
-      const result = await analyzeConfigWithGemini(aiInput);
+      const result = await analyzeConfigWithGemini(aiInput, userApiKey);
       setAiOutput(result);
-    } catch (err) {
-      setAiError("Failed to analyze. Ensure API_KEY is set in environment or try again.");
+    } catch (err: any) {
+      setAiError(err.message || "Failed to analyze. Ensure API_KEY is set.");
     } finally {
       setIsAiLoading(false);
     }
@@ -231,6 +233,23 @@ const App: React.FC = () => {
                     Paste your SKAdNetwork list below. Gemini will identify ad networks, spot duplicates, and validate structure.
                   </p>
                 </div>
+             </div>
+
+             <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  <Key className="w-4 h-4 text-slate-500" />
+                  Gemini API Key
+                </label>
+                <input
+                  type="password"
+                  value={userApiKey}
+                  onChange={(e) => setUserApiKey(e.target.value)}
+                  className="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm shadow-sm"
+                  placeholder="Enter your API Key (optional if configured in environment)"
+                />
+                <p className="text-xs text-slate-500">
+                  Required if not running with a pre-configured environment variable.
+                </p>
              </div>
 
              <div className="space-y-2">
